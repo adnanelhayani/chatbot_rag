@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .input-box {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .send-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .send-btn:hover {
+            background-color: #45a049;
+        }
+        .response {
+            color: #333;
+            padding: 5px;
+        }
+        .user-msg {
+            font-weight: bold;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <h2>Chatbot PDF</h2>
+        <div class="chat-box" id="chat-box">
+            <!-- Messages will appear here -->
+        </div>
+        <input type="text" id="user-input" class="input-box" placeholder="Posez une question..." />
+        <button class="send-btn" onclick="sendMessage()">Envoyer</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            let userInput = document.getElementById('user-input').value;
+            if (userInput) {
+                // Afficher la question de l'utilisateur dans la chatbox
+                appendMessage(userInput, 'user-msg');
+
+                // Envoyer la question à l'API Flask
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: userInput }),
+                });
+
+                const data = await response.json();
+
+                if (data.response) {
+                    // Afficher la réponse du chatbot dans la chatbox
+                    appendMessage(data.response, 'response');
+                } else {
+                    appendMessage('Désolé, je n\'ai pas pu répondre à votre question.', 'response');
+                }
+            }
+        }
+
+        function appendMessage(message, className) {
+            const chatBox = document.getElementById('chat-box');
+            const messageElem = document.createElement('div');
+            messageElem.className = className;
+            messageElem.textContent = message;
+            chatBox.appendChild(messageElem);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
